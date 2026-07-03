@@ -188,6 +188,29 @@
   .notes-input::placeholder { color: #ccc; }
 
   .future { opacity: 0.55; }
+
+  tbody tr.no-receipt-row { background: #fff7ed !important; }
+  tbody tr.no-receipt-row:hover { background: #fef0dd !important; }
+  .badge-noreceipt {
+    display: inline-block;
+    background: #fee2e2;
+    color: #dc2626;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-left: 4px;
+    vertical-align: middle;
+    border: 1px solid #fecaca;
+  }
+  .email-links { display: flex; gap: 6px; margin-top: 2px; }
+  .email-link {
+    font-size: 10px;
+    color: #267dff;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .email-link:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
@@ -235,7 +258,53 @@
 <script>
 // ─── AUTO-LOGGED DATA (written by scheduled task) ────────────────────────────
 // Format: { 'YYYY-MM-DD': { sold: true, amount: 125, matt: false, tom: false, notes: 'SeatGeek: ...', autoLogged: true } }
-const PREFILLED_DATA = {"2026-06-15":{"sold":true,"amount":45.00,"matt":false,"tom":false,"notes":"SeatGeek payout: $45.00 (vs Marlins)","autoLogged":true},"2026-06-16":{"sold":true,"amount":52.20,"matt":false,"tom":false,"notes":"SeatGeek payout: $52.20 (vs Marlins)","autoLogged":true},"2026-06-17":{"sold":true,"amount":32.40,"matt":false,"tom":false,"notes":"SeatGeek payout: $32.40 (vs Marlins)","autoLogged":true},"2026-06-18":{"sold":true,"amount":86.40,"matt":false,"tom":false,"notes":"SeatGeek payout: $86.40 (vs Mets)","autoLogged":true},"2026-06-20":{"sold":true,"amount":0,"matt":false,"tom":false,"notes":"SeatGeek sale confirmed; payout pending (vs Mets)","autoLogged":true},"2026-06-21":{"sold":true,"amount":88.20,"matt":false,"tom":false,"notes":"SeatGeek payout: $88.20 (vs Mets)","autoLogged":true},"2026-06-29":{"sold":true,"amount":176.40,"matt":false,"tom":false,"notes":"SeatGeek: 2 sales, $127.80 (Sec 320) + $48.60 (Sec 420) (vs Pirates)","autoLogged":true},"2026-06-30":{"sold":true,"amount":126.00,"matt":false,"tom":false,"notes":"SeatGeek payout: $126.00 (vs Pirates)","autoLogged":true},"2026-07-01":{"sold":true,"amount":131.40,"matt":false,"tom":false,"notes":"SeatGeek payout: $131.40 (vs Pirates)","autoLogged":true}};
+const PREFILLED_DATA = {
+"2026-03-26":{"sold":true,"amount":273.60,"matt":false,"tom":false,"notes":"SeatGeek payout $273.60 (Opening Day)","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19d1c3f80697165b"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19d3176305a7ee8a"}]},
+"2026-03-28":{"sold":true,"amount":82.80,"matt":false,"tom":false,"notes":"SeatGeek payout $82.80","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19d34e342b612a76"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19d3bf7954b49103"}]},
+"2026-03-29":{"sold":true,"amount":95.40,"matt":false,"tom":false,"notes":"SeatGeek payout $95.40","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19d251deaad6dee2"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19d40495a93b521a"}]},
+"2026-03-30":{"sold":true,"amount":39.60,"matt":false,"tom":false,"notes":"SeatGeek payout $39.60","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19d3c4efe15bb449"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19d48f76d68acf20"}]},
+"2026-03-31":{"sold":true,"amount":93.60,"matt":false,"tom":false,"notes":"SeatGeek payout $93.60","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19d3f6a64ac91da4"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19d4e005ff836e47"}]},
+"2026-04-01":{"sold":true,"amount":48.60,"matt":false,"tom":false,"notes":"SeatGeek payout $48.60","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19d4903d7dfceb87"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19d4fd51f708dccb"}]},
+"2026-04-10":{"sold":true,"amount":82.80,"matt":false,"tom":false,"notes":"SeatGeek payout $82.80","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19d78c6d19771e71"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19d81de19a7fca89"}]},
+"2026-04-11":{"noReceipt":true,"matt":false,"tom":false,"notes":"No SeatGeek email found for this date","autoLogged":true},
+"2026-04-12":{"sold":true,"amount":70.20,"matt":false,"tom":false,"notes":"SeatGeek payout $70.20","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19d821bd5d88f987"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19d88a32f5bb425a"}]},
+"2026-04-13":{"sold":true,"amount":46.80,"matt":false,"tom":false,"notes":"SeatGeek payout $46.80","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19d8284ae1f78fa2"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19d90dba2e6f9ab8"}]},
+"2026-04-14":{"sold":true,"amount":43.20,"matt":false,"tom":false,"notes":"SeatGeek payout $43.20","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19d69df3406cc6c1"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19d95edde25fb243"}]},
+"2026-04-15":{"sold":true,"amount":45.00,"matt":false,"tom":false,"notes":"SeatGeek payout $45.00","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19d701b76e1ab881"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19d9b10b4a65753e"}]},
+"2026-04-17":{"sold":true,"amount":174.60,"matt":false,"tom":false,"notes":"SeatGeek payout $174.60","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19d90c2637d9a5f0"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19da57be4486b4b1"}]},
+"2026-04-18":{"sold":true,"amount":142.20,"matt":false,"tom":false,"notes":"SeatGeek payout $142.20","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19d91f7fcc10f31a"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19daaae69ed64691"}]},
+"2026-04-19":{"sold":true,"amount":64.80,"matt":false,"tom":false,"notes":"SeatGeek payout $64.80","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19d8e5835db133ca"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19daf8d3fe30c85e"}]},
+"2026-04-28":{"sold":true,"amount":25.20,"matt":false,"tom":false,"notes":"SeatGeek payout $25.20","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19dd48b6febef170"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19dde4102e7b2999"}]},
+"2026-04-29":{"sold":true,"amount":21.60,"matt":false,"tom":false,"notes":"SeatGeek payout $21.60","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19ddb8055986b50e"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19de50c2423eb4a9"}]},
+"2026-04-30":{"sold":true,"amount":9.00,"matt":false,"tom":false,"notes":"SeatGeek payout $9.00 (game rescheduled from 4/29)","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19dde8726b167ec3"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19de5a56c885a9db"}]},
+"2026-05-05":{"sold":true,"amount":30.60,"matt":false,"tom":false,"notes":"SeatGeek payout $30.60","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19df914008fb2d7b"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19e0259ac11f1088"}]},
+"2026-05-06":{"sold":true,"amount":9.00,"matt":false,"tom":false,"notes":"SeatGeek payout $9.00","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19dff637fa5c6134"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19e078edec5b0584"}]},
+"2026-05-07":{"sold":true,"amount":32.40,"matt":false,"tom":false,"notes":"SeatGeek payout $32.40","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19dff229c4d0d3df"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19e0c6018ae8c445"}]},
+"2026-05-08":{"sold":true,"amount":48.60,"matt":false,"tom":false,"notes":"SeatGeek payout $48.60","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19e05a3cb232b175"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19e11e186a5f139f"}]},
+"2026-05-09":{"sold":true,"amount":84.60,"matt":false,"tom":false,"notes":"SeatGeek payout $84.60","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19dfdf6d2632d042"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19e16c4d847add3f"}]},
+"2026-05-10":{"noReceipt":true,"matt":false,"tom":false,"notes":"No SeatGeek email found for this date","autoLogged":true},
+"2026-05-18":{"noReceipt":true,"matt":false,"tom":false,"notes":"No SeatGeek email found for this date","autoLogged":true},
+"2026-05-19":{"sold":true,"amount":32.40,"matt":false,"tom":false,"notes":"SeatGeek payout $32.40","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19e40e7d409d0919"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19e4a70edd40da0b"}]},
+"2026-05-20":{"sold":true,"amount":21.60,"matt":false,"tom":false,"notes":"SeatGeek payout $21.60","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19e4629c7697ac88"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19e4c045408e3f77"}]},
+"2026-05-22":{"sold":true,"amount":68.40,"matt":false,"tom":false,"notes":"SeatGeek payout $68.40","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19e4bf70c98c8946"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19e59d8a972562d9"}]},
+"2026-05-23":{"noReceipt":true,"matt":false,"tom":false,"notes":"No SeatGeek email found for this date","autoLogged":true},
+"2026-05-24":{"noReceipt":true,"matt":false,"tom":false,"notes":"No SeatGeek email found for this date","autoLogged":true},
+"2026-06-02":{"sold":true,"amount":48.60,"matt":false,"tom":false,"notes":"SeatGeek payout $48.60","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19e88456fbf24fba"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19e927815d187890"}]},
+"2026-06-03":{"sold":true,"amount":82.80,"matt":false,"tom":false,"notes":"SeatGeek payout $82.80","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19e8daf0c488dfd1"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19e97a481052145f"}]},
+"2026-06-04":{"sold":true,"amount":25.20,"matt":false,"tom":false,"notes":"SeatGeek payout $25.20","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19e930dff6c6f2b5"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19e995034bf0dedd"}]},
+"2026-06-05":{"sold":true,"amount":117.00,"matt":false,"tom":false,"notes":"SeatGeek payout $117.00","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19e952852425a5e8"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19ea1f296e801747"}]},
+"2026-06-06":{"sold":true,"amount":100.80,"matt":false,"tom":false,"notes":"SeatGeek payout $100.80","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19e989c1cddadd62"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19ea4462fe4491da"}]},
+"2026-06-07":{"sold":true,"amount":72.00,"matt":false,"tom":false,"notes":"SeatGeek payout $72.00","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19e9aa10ba905939"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19ea8d13c9f3bbb6"}]},
+"2026-06-15":{"sold":true,"amount":45.00,"matt":false,"tom":false,"notes":"SeatGeek payout $45.00","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19ecc97f4001561e"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19ed5693e0030990"}]},
+"2026-06-16":{"sold":true,"amount":52.20,"matt":false,"tom":false,"notes":"SeatGeek payout $52.20","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19ed0ddad6dd98d8"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19eda96ac5d4aaca"}]},
+"2026-06-17":{"sold":true,"amount":32.40,"matt":false,"tom":false,"notes":"SeatGeek payout $32.40","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19ed1a5c6f424d0e"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19edc43af62912c9"}]},
+"2026-06-18":{"sold":true,"amount":86.40,"matt":false,"tom":false,"notes":"SeatGeek payout $86.40","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19ed179061005b28"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19ee4950ce0a05a2"}]},
+"2026-06-20":{"sold":true,"amount":99.00,"matt":false,"tom":false,"notes":"SeatGeek payout $99.00","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19ee68269561d478"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19eef26c18d29bf0"}]},
+"2026-06-21":{"sold":true,"amount":88.20,"matt":false,"tom":false,"notes":"SeatGeek payout $88.20 (confirmed via email body: game date Jun 21)","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19eead8d46bd6cc6"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19ef42b76035c57a"}]},
+"2026-06-29":{"sold":true,"amount":176.40,"matt":false,"tom":false,"notes":"SeatGeek: 2 sales totaling $176.40 ($127.80 Sec 320 + $48.60 Sec 420)","autoLogged":true,"emails":[{"label":"Sold #1","url":"https://mail.google.com/mail/u/0/#all/19f0bb1ce3d9b2fe"},{"label":"Sold #2","url":"https://mail.google.com/mail/u/0/#all/19f14f45e3bd7747"},{"label":"Paid #1","url":"https://mail.google.com/mail/u/0/#all/19f1d6c56327c6e0"},{"label":"Paid #2","url":"https://mail.google.com/mail/u/0/#all/19f1da55661689db"}]},
+"2026-06-30":{"sold":true,"amount":126.00,"matt":false,"tom":false,"notes":"SeatGeek payout $126.00","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19f19066fd45c912"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19f22cd53a9cad8e"}]},
+"2026-07-01":{"sold":true,"amount":131.40,"matt":false,"tom":false,"notes":"SeatGeek payout $131.40","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19f19066fd45c912"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19f1da55661689db"}]}
+};
 // ─────────────────────────────────────────────────────────────────────────────
 
 const GAMES = [
@@ -315,7 +384,7 @@ function fmtDate(s) {
 
 function isLogged(date) {
   const g = data[date] || {};
-  return !!(g.matt || g.tom || g.sold || (g.notes && g.notes.trim()));
+  return !!(g.matt || g.tom || g.sold || g.noReceipt || (g.notes && g.notes.trim()));
 }
 
 function updateStats() {
@@ -338,7 +407,8 @@ function buildRow(game) {
   const g = data[game.date] || {};
   const isToday = game.date === today;
   const isPast  = game.date <  today;
-  const isAuto  = g.__source === 'auto' && g.autoLogged;
+  const isNoReceipt = g.__source === 'auto' && g.noReceipt;
+  const isAuto  = g.__source === 'auto' && g.autoLogged && g.sold;
 
   const tr = document.createElement('tr');
   tr.dataset.date   = game.date;
@@ -348,6 +418,7 @@ function buildRow(game) {
   if (isToday) tr.classList.add('today-row');
   if (!isPast && !isToday) tr.classList.add('future');
   if (isAuto) tr.classList.add('auto-logged');
+  if (isNoReceipt) tr.classList.add('no-receipt-row');
 
   // Date
   const tdDate = document.createElement('td');
@@ -357,7 +428,7 @@ function buildRow(game) {
   // Opponent
   const tdOpp = document.createElement('td');
   tdOpp.className = 'opp-cell';
-  tdOpp.innerHTML = `vs. ${game.opp}${isToday ? '<span class="today-badge">TODAY</span>' : ''}${isAuto ? '<span class="auto-badge">AUTO</span>' : ''}`;
+  tdOpp.innerHTML = `vs. ${game.opp}${isToday ? '<span class="today-badge">TODAY</span>' : ''}${isAuto ? '<span class="auto-badge">AUTO</span>' : ''}${isNoReceipt ? '<span class="badge-noreceipt">NO RECEIPT</span>' : ''}`;
   tr.appendChild(tdOpp);
 
   // Who
@@ -434,6 +505,22 @@ function buildRow(game) {
     persist();
   };
   tdNotes.appendChild(notesInput);
+
+  if (Array.isArray(g.emails) && g.emails.length) {
+    const linksDiv = document.createElement('div');
+    linksDiv.className = 'email-links';
+    g.emails.forEach(e => {
+      const a = document.createElement('a');
+      a.href = e.url;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.className = 'email-link';
+      a.textContent = `✉ ${e.label}`;
+      linksDiv.appendChild(a);
+    });
+    tdNotes.appendChild(linksDiv);
+  }
+
   tr.appendChild(tdNotes);
 
   return tr;
