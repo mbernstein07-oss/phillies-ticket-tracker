@@ -33,7 +33,7 @@
 
   .stats-row {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: 8px;
     padding: 12px 16px;
     background: white;
@@ -229,6 +229,7 @@
   <div class="stat-card"><div class="stat-value" id="sTom">0</div><div class="stat-label">Tom Used</div></div>
   <div class="stat-card sold-card"><div class="stat-value" id="sSold">0</div><div class="stat-label">Sold</div></div>
   <div class="stat-card money"><div class="stat-value" id="sRev">$0</div><div class="stat-label">Revenue</div></div>
+  <div class="stat-card money"><div class="stat-value" id="sRevPerGame">$0</div><div class="stat-label">$/Game (Not Claimed)</div></div>
 </div>
 
 <div class="filter-bar">
@@ -283,7 +284,7 @@ const PREFILLED_DATA = {
 "2026-05-08":{"sold":true,"amount":48.60,"matt":false,"tom":false,"notes":"SeatGeek payout $48.60","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19e05a3cb232b175"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19e11e186a5f139f"}]},
 "2026-05-09":{"sold":true,"amount":84.60,"matt":false,"tom":false,"notes":"SeatGeek payout $84.60","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19dfdf6d2632d042"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19e16c4d847add3f"}]},
 "2026-05-10":{"sold":true,"amount":100.00,"matt":false,"tom":false,"notes":"Sold directly to Jennifer Gertner for $100 (off-platform, not via SeatGeek)"},
-"2026-05-18":{"noReceipt":true,"matt":false,"tom":false,"notes":"No SeatGeek email found for this date","autoLogged":true},
+"2026-05-18":{"sold":false,"matt":true,"tom":false,"notes":"Matt forgot to list these for sale"},
 "2026-05-19":{"sold":true,"amount":32.40,"matt":false,"tom":false,"notes":"SeatGeek payout $32.40","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19e40e7d409d0919"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19e4a70edd40da0b"}]},
 "2026-05-20":{"sold":true,"amount":21.60,"matt":false,"tom":false,"notes":"SeatGeek payout $21.60","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19e4629c7697ac88"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19e4c045408e3f77"}]},
 "2026-05-22":{"sold":true,"amount":68.40,"matt":false,"tom":false,"notes":"SeatGeek payout $68.40","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19e4bf70c98c8946"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19e59d8a972562d9"}]},
@@ -355,6 +356,45 @@ const GAMES = [
   {date:'2026-06-30',day:'Tue',opp:'Pittsburgh Pirates'},
   {date:'2026-07-01',day:'Wed',opp:'Pittsburgh Pirates'},
   {date:'2026-07-02',day:'Thu',opp:'Pittsburgh Pirates'},
+  {date:'2026-07-10',day:'Fri',opp:'HBCU Swingman Classic',special:true},
+  {date:'2026-07-12',day:'Sun',opp:'All-Star Futures Game / MLBx 3-on-3',special:true},
+  {date:'2026-07-13',day:'Mon',opp:'Home Run Derby',special:true},
+  {date:'2026-07-14',day:'Tue',opp:'MLB All-Star Game',special:true},
+  {date:'2026-07-16',day:'Thu',opp:'New York Mets'},
+  {date:'2026-07-18',day:'Sat',opp:'New York Mets'},
+  {date:'2026-07-19',day:'Sun',opp:'New York Mets'},
+  {date:'2026-07-20',day:'Mon',opp:'Los Angeles Dodgers'},
+  {date:'2026-07-21',day:'Tue',opp:'Los Angeles Dodgers'},
+  {date:'2026-07-22',day:'Wed',opp:'Los Angeles Dodgers'},
+  {date:'2026-07-24',day:'Fri',opp:'New York Yankees'},
+  {date:'2026-07-25',day:'Sat',opp:'New York Yankees'},
+  {date:'2026-07-26',day:'Sun',opp:'New York Yankees'},
+  {date:'2026-08-03',day:'Mon',opp:'Washington Nationals'},
+  {date:'2026-08-04',day:'Tue',opp:'Washington Nationals'},
+  {date:'2026-08-05',day:'Wed',opp:'Washington Nationals'},
+  {date:'2026-08-06',day:'Thu',opp:'Washington Nationals'},
+  {date:'2026-08-07',day:'Fri',opp:'Toronto Blue Jays'},
+  {date:'2026-08-08',day:'Sat',opp:'Toronto Blue Jays'},
+  {date:'2026-08-09',day:'Sun',opp:'Toronto Blue Jays'},
+  {date:'2026-08-17',day:'Mon',opp:'Miami Marlins'},
+  {date:'2026-08-18',day:'Tue',opp:'Miami Marlins'},
+  {date:'2026-08-19',day:'Wed',opp:'Miami Marlins'},
+  {date:'2026-08-21',day:'Fri',opp:'St. Louis Cardinals'},
+  {date:'2026-08-22',day:'Sat',opp:'St. Louis Cardinals'},
+  {date:'2026-08-23',day:'Sun',opp:'St. Louis Cardinals'},
+  {date:'2026-09-04',day:'Fri',opp:'Atlanta Braves'},
+  {date:'2026-09-05',day:'Sat',opp:'Atlanta Braves'},
+  {date:'2026-09-06',day:'Sun',opp:'Atlanta Braves'},
+  {date:'2026-09-07',day:'Mon',opp:'Atlanta Braves'},
+  {date:'2026-09-08',day:'Tue',opp:'Houston Astros'},
+  {date:'2026-09-09',day:'Wed',opp:'Houston Astros'},
+  {date:'2026-09-10',day:'Thu',opp:'Houston Astros'},
+  {date:'2026-09-22',day:'Tue',opp:'Milwaukee Brewers'},
+  {date:'2026-09-23',day:'Wed',opp:'Milwaukee Brewers'},
+  {date:'2026-09-24',day:'Thu',opp:'Milwaukee Brewers'},
+  {date:'2026-09-25',day:'Fri',opp:'Tampa Bay Rays'},
+  {date:'2026-09-26',day:'Sat',opp:'Tampa Bay Rays'},
+  {date:'2026-09-27',day:'Sun',opp:'Tampa Bay Rays'},
 ];
 
 const STORAGE_KEY = 'phillies_2026_v2';
@@ -390,18 +430,27 @@ function isLogged(date) {
 
 function updateStats() {
   let logged=0, matt=0, tom=0, sold=0, rev=0;
+  let notClaimedCount=0, notClaimedRev=0;
   GAMES.forEach(g => {
+    if (g.special) return;
     const d = data[g.date] || {};
-    if (isLogged(g.date)) logged++;
+    if (!isLogged(g.date)) return;
+    logged++;
     if (d.matt) matt++;
     if (d.tom) tom++;
     if (d.sold) { sold++; rev += (parseFloat(d.amount) || 0); }
+    if (!d.matt && !d.tom) {
+      notClaimedCount++;
+      notClaimedRev += (parseFloat(d.amount) || 0);
+    }
   });
   document.getElementById('sLogged').textContent = logged;
   document.getElementById('sMatt').textContent = matt;
   document.getElementById('sTom').textContent = tom;
   document.getElementById('sSold').textContent = sold;
   document.getElementById('sRev').textContent = '$' + rev.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0});
+  const perGame = notClaimedCount ? notClaimedRev / notClaimedCount : 0;
+  document.getElementById('sRevPerGame').textContent = '$' + perGame.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
 }
 
 function buildRow(game) {
@@ -429,7 +478,7 @@ function buildRow(game) {
   // Opponent
   const tdOpp = document.createElement('td');
   tdOpp.className = 'opp-cell';
-  tdOpp.innerHTML = `vs. ${game.opp}${isToday ? '<span class="today-badge">TODAY</span>' : ''}${isAuto ? '<span class="auto-badge">AUTO</span>' : ''}${isNoReceipt ? '<span class="badge-noreceipt">NO RECEIPT</span>' : ''}`;
+  tdOpp.innerHTML = `${game.special ? '' : 'vs. '}${game.opp}${isToday ? '<span class="today-badge">TODAY</span>' : ''}${isAuto ? '<span class="auto-badge">AUTO</span>' : ''}${isNoReceipt ? '<span class="badge-noreceipt">NO RECEIPT</span>' : ''}`;
   tr.appendChild(tdOpp);
 
   // Who
