@@ -457,7 +457,7 @@ function fmtDate(s) {
 
 function isLogged(date) {
   const g = data[date] || {};
-  return !!(g.matt || g.tom || g.sold || g.noReceipt || (g.notes && g.notes.trim()));
+  return !!(g.matt || g.tom || g.sold || g.noReceipt || g.checkedNoReceipt || (g.notes && g.notes.trim()));
 }
 
 function updateStats() {
@@ -494,7 +494,7 @@ function buildRow(game) {
   const g = data[game.date] || {};
   const isToday = game.date === today;
   const isPast  = game.date <  today;
-  const isNoReceipt = g.__source === 'auto' && g.noReceipt;
+  const isNoReceipt = g.__source === 'auto' && (g.noReceipt || g.checkedNoReceipt);
   const isAuto  = g.__source === 'auto' && g.autoLogged && g.sold;
 
   const tr = document.createElement('tr');
@@ -515,7 +515,8 @@ function buildRow(game) {
   // Opponent
   const tdOpp = document.createElement('td');
   tdOpp.className = 'opp-cell';
-  tdOpp.innerHTML = `${game.special ? '' : 'vs. '}${game.opp}${isToday ? '<span class="today-badge">TODAY</span>' : ''}${isAuto ? '<span class="auto-badge">AUTO</span>' : ''}${isNoReceipt ? '<span class="badge-noreceipt">NO RECEIPT</span>' : ''}`;
+  const noReceiptTitle = g.checkedNoReceipt ? ` title="Checked as of ${g.checkedAt || 'unknown date'} — will not be re-searched automatically"` : '';
+  tdOpp.innerHTML = `${game.special ? '' : 'vs. '}${game.opp}${isToday ? '<span class="today-badge">TODAY</span>' : ''}${isAuto ? '<span class="auto-badge">AUTO</span>' : ''}${isNoReceipt ? `<span class="badge-noreceipt"${noReceiptTitle}>NO RECEIPT</span>` : ''}`;
   tr.appendChild(tdOpp);
 
   // Who
