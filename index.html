@@ -31,6 +31,16 @@
   .header-title { font-size: 17px; font-weight: 700; }
   .header-sub { font-size: 11px; opacity: 0.8; margin-top: 2px; }
 
+  .cost-banner {
+    background: #fffbeb;
+    border-bottom: 1px solid #fde68a;
+    padding: 10px 16px;
+    text-align: center;
+  }
+  .cost-banner-main { font-size: 22px; font-weight: 800; color: #92400e; }
+  .cost-banner-label { font-size: 12px; font-weight: 600; color: #92400e; }
+  .cost-banner-sub { font-size: 10px; color: #b45309; margin-top: 2px; }
+
   .stats-row {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
@@ -229,6 +239,11 @@
   </div>
 </div>
 
+<div class="cost-banner">
+  <div class="cost-banner-main"><span id="costPerGame">$0</span> <span class="cost-banner-label">per Phillies home game</span></div>
+  <div class="cost-banner-sub" id="costBannerSub"></div>
+</div>
+
 <div class="stats-row">
   <div class="stat-card"><div class="stat-value" id="sLogged">0</div><div class="stat-label">Logged</div></div>
   <div class="stat-card"><div class="stat-value" id="sMatt">0</div><div class="stat-label">Matt Used</div></div>
@@ -406,8 +421,18 @@ const GAMES = [
 
 const STORAGE_KEY = 'phillies_2026_v2';
 const today = new Date().toISOString().slice(0,10);
+const SEASON_TICKET_COST = 8008; // paid for 2 tickets to each Phillies home game (All-Star Week events excluded)
 let data = {};
 let activeFilter = 'all';
+
+function updateCostBanner() {
+  const homeGames = GAMES.filter(g => !g.special);
+  const perGame = homeGames.length ? SEASON_TICKET_COST / homeGames.length : 0;
+  document.getElementById('costPerGame').textContent =
+    '$' + perGame.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+  document.getElementById('costBannerSub').textContent =
+    `$${SEASON_TICKET_COST.toLocaleString()} total for 2 tickets across ${homeGames.length} Phillies home games (All-Star Week excluded)`;
+}
 
 function load() {
   try { data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e) { data = {}; }
@@ -612,6 +637,7 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
 load();
 render();
 updateStats();
+updateCostBanner();
 </script>
 </body>
 </html>
