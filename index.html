@@ -1,0 +1,468 @@
+<!DOCTYPE html><script type="application/json" id="cowork-artifact-meta">
+{
+  "name": "Phillies Ticket Tracker",
+  "schemaVersion": 1,
+  "description": "2026 Phillies season ticket tracker. Auto-logs SeatGeek sales nightly via scheduled task. Manual edits for Matt/Tom attendance. Persists across sessions."
+}
+</script>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phillies Ticket Tracker 2026</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f5f5f5;
+    color: #1a1a1a;
+    font-size: 14px;
+  }
+  .header {
+    background: linear-gradient(135deg, #E81828 0%, #002D62 100%);
+    color: white;
+    padding: 16px 20px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .header-logo { font-size: 26px; }
+  .header-title { font-size: 17px; font-weight: 700; }
+  .header-sub { font-size: 11px; opacity: 0.8; margin-top: 2px; }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    padding: 12px 16px;
+    background: white;
+    border-bottom: 1px solid #e5e5e5;
+  }
+  .stat-card {
+    background: #f9f9f9;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    padding: 9px 10px;
+    text-align: center;
+  }
+  .stat-value { font-size: 20px; font-weight: 700; color: #002D62; }
+  .stat-label { font-size: 10px; color: #777; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .stat-card.money .stat-value { color: #16a34a; }
+  .stat-card.sold-card .stat-value { color: #E81828; }
+
+  .filter-bar {
+    display: flex;
+    gap: 6px;
+    padding: 8px 16px;
+    background: white;
+    border-bottom: 1px solid #e5e5e5;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .filter-bar span { font-size: 11px; color: #888; margin-right: 2px; }
+  .filter-btn {
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    background: white;
+    font-size: 11px;
+    cursor: pointer;
+    color: #444;
+    transition: all 0.15s;
+  }
+  .filter-btn.active { background: #002D62; color: white; border-color: #002D62; }
+  .filter-btn:hover:not(.active) { background: #f0f0f0; }
+
+  .table-wrap { padding: 0 16px 24px; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 560px; }
+  thead th {
+    background: #002D62;
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 7px 10px;
+    text-align: left;
+    white-space: nowrap;
+  }
+  tbody tr { border-bottom: 1px solid #eee; background: white; }
+  tbody tr:nth-child(even) { background: #fafafa; }
+  tbody tr:hover { background: #f0f4ff; }
+  tbody tr.today-row { background: #fff8e1 !important; }
+  tbody tr.auto-logged { border-left: 3px solid #16a34a; }
+
+  td { padding: 6px 10px; vertical-align: middle; }
+
+  .date-cell .day { font-weight: 600; font-size: 12px; color: #002D62; }
+  .date-cell .dt { font-size: 11px; color: #888; }
+
+  .opp-cell { font-size: 13px; font-weight: 500; }
+  .today-badge {
+    display: inline-block;
+    background: #E81828;
+    color: white;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 4px;
+    border-radius: 3px;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+  .auto-badge {
+    display: inline-block;
+    background: #dcfce7;
+    color: #16a34a;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-left: 4px;
+    vertical-align: middle;
+    border: 1px solid #bbf7d0;
+  }
+
+  .who-cell { display: flex; gap: 5px; }
+  .who-btn {
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    background: white;
+    font-size: 11px;
+    cursor: pointer;
+    color: #555;
+    font-weight: 500;
+    transition: all 0.12s;
+  }
+  .who-btn.on-matt { background: #002D62; color: white; border-color: #002D62; }
+  .who-btn.on-tom  { background: #E81828; color: white; border-color: #E81828; }
+
+  .sold-cell { display: flex; align-items: center; gap: 6px; }
+  .toggle {
+    width: 36px; height: 19px;
+    border-radius: 10px;
+    background: #ddd;
+    position: relative;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 15px; height: 15px;
+    border-radius: 50%;
+    background: white;
+    top: 2px; left: 2px;
+    transition: left 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.25);
+  }
+  .toggle.on { background: #16a34a; }
+  .toggle.on::after { left: 19px; }
+
+  .amt-wrap { display: flex; align-items: center; gap: 3px; }
+  .amt-label { font-size: 11px; color: #888; }
+  .amt-input {
+    width: 65px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    display: none;
+  }
+  .amt-input.show { display: block; }
+  .amt-input:focus { outline: none; border-color: #16a34a; }
+
+  .notes-input {
+    width: 100%;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 3px 5px;
+    font-size: 11px;
+    color: #444;
+    background: transparent;
+  }
+  .notes-input:focus { outline: none; border-color: #c0d0ff; background: white; }
+  .notes-input::placeholder { color: #ccc; }
+
+  .future { opacity: 0.55; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">⚾</div>
+  <div>
+    <div class="header-title">Phillies Ticket Tracker — 2026</div>
+    <div class="header-sub">2 season tickets · Citizens Bank Park</div>
+  </div>
+</div>
+
+<div class="stats-row">
+  <div class="stat-card"><div class="stat-value" id="sLogged">0</div><div class="stat-label">Logged</div></div>
+  <div class="stat-card"><div class="stat-value" id="sMatt">0</div><div class="stat-label">Matt Used</div></div>
+  <div class="stat-card"><div class="stat-value" id="sTom">0</div><div class="stat-label">Tom Used</div></div>
+  <div class="stat-card sold-card"><div class="stat-value" id="sSold">0</div><div class="stat-label">Sold</div></div>
+  <div class="stat-card money"><div class="stat-value" id="sRev">$0</div><div class="stat-label">Revenue</div></div>
+</div>
+
+<div class="filter-bar">
+  <span>Show:</span>
+  <button class="filter-btn active" data-f="all">All</button>
+  <button class="filter-btn" data-f="past">Past</button>
+  <button class="filter-btn" data-f="upcoming">Upcoming</button>
+  <button class="filter-btn" data-f="sold">Sold</button>
+  <button class="filter-btn" data-f="unlogged">Unlogged</button>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th style="width:72px">Date</th>
+        <th>Opponent</th>
+        <th style="width:150px">Who Used It?</th>
+        <th style="width:160px">Sold?</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<script>
+// ─── AUTO-LOGGED DATA (written by scheduled task) ────────────────────────────
+// Format: { 'YYYY-MM-DD': { sold: true, amount: 125, matt: false, tom: false, notes: 'SeatGeek: ...', autoLogged: true } }
+const PREFILLED_DATA = {"2026-06-15":{"sold":true,"amount":45.00,"matt":false,"tom":false,"notes":"SeatGeek payout: $45.00 (vs Marlins)","autoLogged":true},"2026-06-16":{"sold":true,"amount":52.20,"matt":false,"tom":false,"notes":"SeatGeek payout: $52.20 (vs Marlins)","autoLogged":true},"2026-06-17":{"sold":true,"amount":32.40,"matt":false,"tom":false,"notes":"SeatGeek payout: $32.40 (vs Marlins)","autoLogged":true},"2026-06-18":{"sold":true,"amount":86.40,"matt":false,"tom":false,"notes":"SeatGeek payout: $86.40 (vs Mets)","autoLogged":true},"2026-06-20":{"sold":true,"amount":0,"matt":false,"tom":false,"notes":"SeatGeek sale confirmed; payout pending (vs Mets)","autoLogged":true},"2026-06-21":{"sold":true,"amount":88.20,"matt":false,"tom":false,"notes":"SeatGeek payout: $88.20 (vs Mets)","autoLogged":true},"2026-06-29":{"sold":true,"amount":176.40,"matt":false,"tom":false,"notes":"SeatGeek: 2 sales, $127.80 (Sec 320) + $48.60 (Sec 420) (vs Pirates)","autoLogged":true},"2026-06-30":{"sold":true,"amount":126.00,"matt":false,"tom":false,"notes":"SeatGeek payout: $126.00 (vs Pirates)","autoLogged":true},"2026-07-01":{"sold":true,"amount":131.40,"matt":false,"tom":false,"notes":"SeatGeek payout: $131.40 (vs Pirates)","autoLogged":true}};
+// ─────────────────────────────────────────────────────────────────────────────
+
+const GAMES = [
+  {date:'2026-03-26',day:'Thu',opp:'Texas Rangers'},
+  {date:'2026-03-28',day:'Sat',opp:'Texas Rangers'},
+  {date:'2026-03-29',day:'Sun',opp:'Texas Rangers'},
+  {date:'2026-03-30',day:'Mon',opp:'Washington Nationals'},
+  {date:'2026-03-31',day:'Tue',opp:'Washington Nationals'},
+  {date:'2026-04-01',day:'Wed',opp:'Washington Nationals'},
+  {date:'2026-04-10',day:'Fri',opp:'Arizona Diamondbacks'},
+  {date:'2026-04-11',day:'Sat',opp:'Arizona Diamondbacks'},
+  {date:'2026-04-12',day:'Sun',opp:'Arizona Diamondbacks'},
+  {date:'2026-04-13',day:'Mon',opp:'Chicago Cubs'},
+  {date:'2026-04-14',day:'Tue',opp:'Chicago Cubs'},
+  {date:'2026-04-15',day:'Wed',opp:'Chicago Cubs'},
+  {date:'2026-04-17',day:'Fri',opp:'Atlanta Braves'},
+  {date:'2026-04-18',day:'Sat',opp:'Atlanta Braves'},
+  {date:'2026-04-19',day:'Sun',opp:'Atlanta Braves'},
+  {date:'2026-04-28',day:'Tue',opp:'San Francisco Giants'},
+  {date:'2026-04-29',day:'Wed',opp:'San Francisco Giants'},
+  {date:'2026-04-30',day:'Thu',opp:'San Francisco Giants'},
+  {date:'2026-05-05',day:'Tue',opp:'Athletics'},
+  {date:'2026-05-06',day:'Wed',opp:'Athletics'},
+  {date:'2026-05-07',day:'Thu',opp:'Athletics'},
+  {date:'2026-05-08',day:'Fri',opp:'Colorado Rockies'},
+  {date:'2026-05-09',day:'Sat',opp:'Colorado Rockies'},
+  {date:'2026-05-10',day:'Sun',opp:'Colorado Rockies'},
+  {date:'2026-05-18',day:'Mon',opp:'Cincinnati Reds'},
+  {date:'2026-05-19',day:'Tue',opp:'Cincinnati Reds'},
+  {date:'2026-05-20',day:'Wed',opp:'Cincinnati Reds'},
+  {date:'2026-05-22',day:'Fri',opp:'Cleveland Guardians'},
+  {date:'2026-05-23',day:'Sat',opp:'Cleveland Guardians'},
+  {date:'2026-05-24',day:'Sun',opp:'Cleveland Guardians'},
+  {date:'2026-06-02',day:'Tue',opp:'San Diego Padres'},
+  {date:'2026-06-03',day:'Wed',opp:'San Diego Padres'},
+  {date:'2026-06-04',day:'Thu',opp:'San Diego Padres'},
+  {date:'2026-06-05',day:'Fri',opp:'Chicago White Sox'},
+  {date:'2026-06-06',day:'Sat',opp:'Chicago White Sox'},
+  {date:'2026-06-07',day:'Sun',opp:'Chicago White Sox'},
+  {date:'2026-06-15',day:'Mon',opp:'Miami Marlins'},
+  {date:'2026-06-16',day:'Tue',opp:'Miami Marlins'},
+  {date:'2026-06-17',day:'Wed',opp:'Miami Marlins'},
+  {date:'2026-06-18',day:'Thu',opp:'New York Mets'},
+  {date:'2026-06-20',day:'Sat',opp:'New York Mets'},
+  {date:'2026-06-21',day:'Sun',opp:'New York Mets'},
+  {date:'2026-06-29',day:'Mon',opp:'Pittsburgh Pirates'},
+  {date:'2026-06-30',day:'Tue',opp:'Pittsburgh Pirates'},
+  {date:'2026-07-01',day:'Wed',opp:'Pittsburgh Pirates'},
+  {date:'2026-07-02',day:'Thu',opp:'Pittsburgh Pirates'},
+];
+
+const STORAGE_KEY = 'phillies_2026_v2';
+const today = new Date().toISOString().slice(0,10);
+let data = {};
+let activeFilter = 'all';
+
+function load() {
+  try { data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e) { data = {}; }
+  // Merge PREFILLED_DATA (scheduled task writes) into localStorage — only if not already manually overridden
+  Object.entries(PREFILLED_DATA).forEach(([date, prefilled]) => {
+    if (!data[date] || data[date].__source !== 'manual') {
+      data[date] = { ...prefilled, __source: 'auto' };
+    }
+  });
+}
+
+function persist() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  updateStats();
+}
+
+function fmtDate(s) {
+  const [,m,d] = s.split('-');
+  const mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${mo[+m-1]} ${+d}`;
+}
+
+function isLogged(date) {
+  const g = data[date] || {};
+  return !!(g.matt || g.tom || g.sold || (g.notes && g.notes.trim()));
+}
+
+function updateStats() {
+  let logged=0, matt=0, tom=0, sold=0, rev=0;
+  GAMES.forEach(g => {
+    const d = data[g.date] || {};
+    if (isLogged(g.date)) logged++;
+    if (d.matt) matt++;
+    if (d.tom) tom++;
+    if (d.sold) { sold++; rev += (parseFloat(d.amount) || 0); }
+  });
+  document.getElementById('sLogged').textContent = logged;
+  document.getElementById('sMatt').textContent = matt;
+  document.getElementById('sTom').textContent = tom;
+  document.getElementById('sSold').textContent = sold;
+  document.getElementById('sRev').textContent = '$' + rev.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0});
+}
+
+function buildRow(game) {
+  const g = data[game.date] || {};
+  const isToday = game.date === today;
+  const isPast  = game.date <  today;
+  const isAuto  = g.__source === 'auto' && g.autoLogged;
+
+  const tr = document.createElement('tr');
+  tr.dataset.date   = game.date;
+  tr.dataset.past   = (isPast || isToday) ? '1' : '0';
+  tr.dataset.logged = isLogged(game.date) ? '1' : '0';
+  tr.dataset.sold   = g.sold ? '1' : '0';
+  if (isToday) tr.classList.add('today-row');
+  if (!isPast && !isToday) tr.classList.add('future');
+  if (isAuto) tr.classList.add('auto-logged');
+
+  // Date
+  const tdDate = document.createElement('td');
+  tdDate.innerHTML = `<div class="date-cell"><div class="day">${game.day}</div><div class="dt">${fmtDate(game.date)}</div></div>`;
+  tr.appendChild(tdDate);
+
+  // Opponent
+  const tdOpp = document.createElement('td');
+  tdOpp.className = 'opp-cell';
+  tdOpp.innerHTML = `vs. ${game.opp}${isToday ? '<span class="today-badge">TODAY</span>' : ''}${isAuto ? '<span class="auto-badge">AUTO</span>' : ''}`;
+  tr.appendChild(tdOpp);
+
+  // Who
+  const tdWho = document.createElement('td');
+  const whoDiv = document.createElement('div');
+  whoDiv.className = 'who-cell';
+
+  ['matt','tom'].forEach(person => {
+    const btn = document.createElement('button');
+    btn.className = `who-btn${g[person] ? ` on-${person}` : ''}`;
+    btn.textContent = person === 'matt' ? 'Matt' : 'Tom';
+    btn.onclick = () => {
+      if (!data[game.date]) data[game.date] = {};
+      data[game.date][person] = !data[game.date][person];
+      data[game.date].__source = 'manual';
+      render(); persist();
+    };
+    whoDiv.appendChild(btn);
+  });
+  tdWho.appendChild(whoDiv);
+  tr.appendChild(tdWho);
+
+  // Sold toggle + amount
+  const tdSold = document.createElement('td');
+  const soldDiv = document.createElement('div');
+  soldDiv.className = 'sold-cell';
+
+  const tog = document.createElement('button');
+  tog.className = `toggle${g.sold ? ' on' : ''}`;
+  tog.onclick = () => {
+    if (!data[game.date]) data[game.date] = {};
+    data[game.date].sold = !data[game.date].sold;
+    data[game.date].__source = 'manual';
+    if (!data[game.date].sold) delete data[game.date].amount;
+    render(); persist();
+  };
+
+  const amtWrap = document.createElement('div');
+  amtWrap.className = 'amt-wrap';
+  const amtLabel = document.createElement('span');
+  amtLabel.className = 'amt-label';
+  amtLabel.textContent = '$';
+  const amtInput = document.createElement('input');
+  amtInput.type = 'number';
+  amtInput.className = `amt-input${g.sold ? ' show' : ''}`;
+  amtInput.placeholder = '0';
+  amtInput.value = g.amount || '';
+  amtInput.title = 'Total for both tickets';
+  amtInput.oninput = () => {
+    if (!data[game.date]) data[game.date] = {};
+    data[game.date].amount = parseFloat(amtInput.value) || 0;
+    data[game.date].__source = 'manual';
+    persist();
+  };
+
+  if (g.sold) amtWrap.appendChild(amtLabel);
+  amtWrap.appendChild(amtInput);
+  soldDiv.appendChild(tog);
+  soldDiv.appendChild(amtWrap);
+  tdSold.appendChild(soldDiv);
+  tr.appendChild(tdSold);
+
+  // Notes
+  const tdNotes = document.createElement('td');
+  const notesInput = document.createElement('input');
+  notesInput.type = 'text';
+  notesInput.className = 'notes-input';
+  notesInput.placeholder = 'Notes…';
+  notesInput.value = g.notes || '';
+  notesInput.onchange = () => {
+    if (!data[game.date]) data[game.date] = {};
+    data[game.date].notes = notesInput.value;
+    data[game.date].__source = 'manual';
+    persist();
+  };
+  tdNotes.appendChild(notesInput);
+  tr.appendChild(tdNotes);
+
+  return tr;
+}
+
+function render() {
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+  GAMES.filter(g => {
+    if (activeFilter === 'past')     return g.date <= today;
+    if (activeFilter === 'upcoming') return g.date > today;
+    if (activeFilter === 'sold')     return (data[g.date]||{}).sold;
+    if (activeFilter === 'unlogged') return !isLogged(g.date) && g.date <= today;
+    return true;
+  }).forEach(g => tbody.appendChild(buildRow(g)));
+}
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.dataset.f;
+    render();
+  });
+});
+
+load();
+render();
+updateStats();
+</script>
+</body>
+</html>
