@@ -41,6 +41,16 @@
   .cost-banner-label { font-size: 12px; font-weight: 600; color: #92400e; }
   .cost-banner-sub { font-size: 10px; color: #b45309; margin-top: 2px; }
 
+  .allstar-banner {
+    padding: 8px 16px;
+    background: #eff6ff;
+    border-bottom: 1px solid #dbeafe;
+    font-size: 11px;
+    color: #1e3a8a;
+    text-align: center;
+  }
+  .allstar-banner strong { color: #002D62; }
+
   .stats-row {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
@@ -244,6 +254,8 @@
   <div class="cost-banner-sub" id="costBannerSub"></div>
 </div>
 
+<div class="allstar-banner" id="allStarBanner"></div>
+
 <div class="stats-row">
   <div class="stat-card"><div class="stat-value" id="sLogged">0</div><div class="stat-label">Logged</div></div>
   <div class="stat-card"><div class="stat-value" id="sMatt">0</div><div class="stat-label">Matt Used</div></div>
@@ -269,6 +281,7 @@
       <tr>
         <th style="width:72px">Date</th>
         <th>Opponent</th>
+        <th style="width:90px">Cost</th>
         <th style="width:150px">Who Used It?</th>
         <th style="width:160px">Sold?</th>
         <th>Notes</th>
@@ -327,7 +340,10 @@ const PREFILLED_DATA = {
 "2026-06-29":{"sold":true,"amount":176.40,"matt":false,"tom":false,"notes":"SeatGeek: 2 sales totaling $176.40 ($127.80 Sec 320 + $48.60 Sec 420)","autoLogged":true,"emails":[{"label":"Sold #1","url":"https://mail.google.com/mail/u/0/#all/19f0bb1ce3d9b2fe"},{"label":"Sold #2","url":"https://mail.google.com/mail/u/0/#all/19f14f45e3bd7747"},{"label":"Paid #1","url":"https://mail.google.com/mail/u/0/#all/19f1d6c56327c6e0"},{"label":"Paid #2","url":"https://mail.google.com/mail/u/0/#all/19f1da55661689db"}]},
 "2026-06-30":{"sold":true,"amount":126.00,"matt":false,"tom":false,"notes":"SeatGeek payout $126.00","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19f19066fd45c912"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19f22cd53a9cad8e"}]},
 "2026-07-01":{"sold":true,"amount":131.40,"matt":false,"tom":false,"notes":"SeatGeek sale confirmed; $131.40 is the estimated payout shown in the sale email (no separate payout-received email yet)","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19f19066fd45c912"}]},
-"2026-07-02":{"sold":false,"amount":0,"matt":false,"tom":false,"notes":"Did not sell on SeatGeek"}
+"2026-07-02":{"sold":false,"amount":0,"matt":false,"tom":false,"notes":"Did not sell on SeatGeek"},
+"2026-07-12":{"cost":1564.00,"sold":true,"amount":34.20,"matt":false,"tom":false,"notes":"2026 All-Star Week Strip: 2 seats (Sec 320, Row 2, Seat 7-8) at $782/seat = $1,564 total — covers All-Star Village passes, this Futures Game/MLBx, the Home Run Derby, and the All-Star Game (full strip cost logged here). Sold these Futures Game seats via SeatGeek for $34.20 net.","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19f3a6008574935b"}]},
+"2026-07-13":{"cost":0,"matt":false,"tom":false,"notes":"Included in the All-Star Week Strip — same seats (Sec 320, Row 2, Seat 7-8); the $1,564 strip cost is logged on the Jul 12 entry. Outcome (used/sold/given away) not yet logged.","autoLogged":true},
+"2026-07-14":{"cost":485.00,"matt":false,"tom":false,"notes":"Base All-Star Game seats (Sec 320, Row 2, Seat 7-8) are part of the All-Star Week Strip — cost logged on the Jul 12 entry. Also separately purchased 2 Standing Room Only tickets via the STH \"Additional All-Star Week Ticket Offer\" for $485 total ($440 + $45 fees), confirmation PHLV-2092535-72703040 — that $485 is logged here. Outcome for all 4 tickets not yet logged.","autoLogged":true,"emails":[{"label":"SRO Purchase","url":"https://mail.google.com/mail/u/0/#all/19efb13beb535f8d"}]}
 };
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -464,8 +480,15 @@ function updateStats() {
   let logged=0, matt=0, tom=0, sold=0, rev=0;
   let notClaimedCount=0, notClaimedRev=0;
   let claimedExcluded=0, futureExcluded=0, allStarExcluded=0;
+  let allStarCost=0, allStarRecovered=0;
   GAMES.forEach(g => {
-    if (g.special) { allStarExcluded++; return; }
+    if (g.special) {
+      allStarExcluded++;
+      const d = data[g.date] || {};
+      allStarCost += (parseFloat(d.cost) || 0);
+      if (d.sold) allStarRecovered += (parseFloat(d.amount) || 0);
+      return;
+    }
     const d = data[g.date] || {};
     if (!isLogged(g.date)) { futureExcluded++; return; }
     logged++;
@@ -488,6 +511,11 @@ function updateStats() {
   document.getElementById('sRevPerGame').textContent = '$' + perGame.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
   document.getElementById('statsFootnote').textContent =
     `$/Game is calculated from ${notClaimedCount} games — excludes ${claimedExcluded} claimed by Matt/Tom, ${futureExcluded} not yet played, and ${allStarExcluded} All-Star Week events.`;
+  const allStarNet = allStarCost - allStarRecovered;
+  document.getElementById('allStarBanner').innerHTML =
+    `<strong>All-Star Week:</strong> $${allStarCost.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} spent on tickets · ` +
+    `$${allStarRecovered.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} recovered from sales · ` +
+    `net <strong>$${allStarNet.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</strong>`;
 }
 
 function buildRow(game) {
@@ -518,6 +546,34 @@ function buildRow(game) {
   const noReceiptTitle = g.checkedNoReceipt ? ` title="Checked as of ${g.checkedAt || 'unknown date'} — will not be re-searched automatically"` : '';
   tdOpp.innerHTML = `${game.special ? '' : 'vs. '}${game.opp}${isToday ? '<span class="today-badge">TODAY</span>' : ''}${isAuto ? '<span class="auto-badge">AUTO</span>' : ''}${isNoReceipt ? `<span class="badge-noreceipt"${noReceiptTitle}>NO RECEIPT</span>` : ''}`;
   tr.appendChild(tdOpp);
+
+  // Cost (purchase price — only editable for All-Star Week special events)
+  const tdCost = document.createElement('td');
+  if (game.special) {
+    const costWrap = document.createElement('div');
+    costWrap.className = 'amt-wrap';
+    const costLabel = document.createElement('span');
+    costLabel.className = 'amt-label';
+    costLabel.textContent = '$';
+    const costInput = document.createElement('input');
+    costInput.type = 'number';
+    costInput.className = 'amt-input show';
+    costInput.placeholder = '0';
+    costInput.value = g.cost || '';
+    costInput.title = 'Purchase cost (both tickets)';
+    costInput.oninput = () => {
+      if (!data[game.date]) data[game.date] = {};
+      data[game.date].cost = parseFloat(costInput.value) || 0;
+      data[game.date].__source = 'manual';
+      persist();
+    };
+    costWrap.appendChild(costLabel);
+    costWrap.appendChild(costInput);
+    tdCost.appendChild(costWrap);
+  } else {
+    tdCost.innerHTML = '<span style="color:#ccc;font-size:11px;">—</span>';
+  }
+  tr.appendChild(tdCost);
 
   // Who
   const tdWho = document.createElement('td');
