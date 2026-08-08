@@ -454,16 +454,16 @@ const GAMES = [
 const STORAGE_KEY = 'phillies_2026_v2';
 const today = new Date().toISOString().slice(0,10);
 const SEASON_TICKET_COST = 8008; // paid for 2 tickets to each Phillies home game (All-Star Week events excluded)
+const HOME_GAMES = GAMES.filter(g => !g.special);
+const AVG_COST_PER_GAME = HOME_GAMES.length ? SEASON_TICKET_COST / HOME_GAMES.length : 0;
 let data = {};
 let activeFilter = 'all';
 
 function updateCostBanner() {
-  const homeGames = GAMES.filter(g => !g.special);
-  const perGame = homeGames.length ? SEASON_TICKET_COST / homeGames.length : 0;
   document.getElementById('costPerGame').textContent =
-    '$' + perGame.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+    '$' + AVG_COST_PER_GAME.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
   document.getElementById('costBannerSub').textContent =
-    `$${SEASON_TICKET_COST.toLocaleString()} total for 2 tickets across ${homeGames.length} Phillies home games (All-Star Week excluded)`;
+    `$${SEASON_TICKET_COST.toLocaleString()} total for 2 tickets across ${HOME_GAMES.length} Phillies home games (All-Star Week excluded)`;
 }
 
 function load() {
@@ -590,8 +590,10 @@ function buildRow(game) {
     costWrap.appendChild(costLabel);
     costWrap.appendChild(costInput);
     tdCost.appendChild(costWrap);
+  } else if (g.cost !== undefined && g.cost !== null && g.cost !== '') {
+    tdCost.innerHTML = `<span style="font-size:11px;color:#444;" title="Actual purchase cost for this game (extra tickets bought outside the season plan)">$${parseFloat(g.cost).toFixed(2)}</span>`;
   } else {
-    tdCost.innerHTML = '<span style="color:#ccc;font-size:11px;">—</span>';
+    tdCost.innerHTML = `<span style="font-size:11px;color:#999;" title="Average per-game cost: $${SEASON_TICKET_COST.toLocaleString()} season total ÷ ${HOME_GAMES.length} home games — not an itemized per-game price">~$${AVG_COST_PER_GAME.toFixed(2)}</span>`;
   }
   tr.appendChild(tdCost);
 
