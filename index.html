@@ -53,7 +53,7 @@
 
   .stats-row {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(7, 1fr);
     gap: 8px;
     padding: 12px 16px 4px;
     background: white;
@@ -263,6 +263,7 @@
   <div class="stat-card sold-card"><div class="stat-value" id="sSold">0</div><div class="stat-label">Sold</div></div>
   <div class="stat-card money"><div class="stat-value" id="sRev">$0</div><div class="stat-label">Revenue</div></div>
   <div class="stat-card money" title="Excludes: games Matt or Tom claimed for personal use, games that haven't happened yet, and All-Star Week events"><div class="stat-value" id="sRevPerGame">$0</div><div class="stat-label">$/Game (Not Claimed)</div></div>
+  <div class="stat-card money" title="Revenue minus cost, summed only over games already played that were put up for sale — excludes All-Star Week, games not yet played, and games Matt or Tom claimed for personal use or gave away"><div class="stat-value" id="sResolvedNet">$0</div><div class="stat-label">Net P/L (Resolved)</div></div>
 </div>
 <div class="stats-footnote" id="statsFootnote"></div>
 
@@ -497,6 +498,7 @@ function updateStats() {
   let notClaimedCount=0, notClaimedRev=0;
   let claimedExcluded=0, futureExcluded=0, allStarExcluded=0;
   let allStarCost=0, allStarRecovered=0;
+  let resolvedNet=0;
   GAMES.forEach(g => {
     if (g.special) {
       allStarExcluded++;
@@ -509,6 +511,12 @@ function updateStats() {
       return;
     }
     const d = data[g.date] || {};
+    const isPastGame = g.date <= today;
+    const isAttributed = !!(d.matt || d.tom);
+    if (isPastGame && !isAttributed) {
+      const gCost = (d.cost !== undefined && d.cost !== null && d.cost !== '') ? parseFloat(d.cost) : AVG_COST_PER_GAME;
+      resolvedNet += (d.sold ? (parseFloat(d.amount) || 0) : 0) - gCost;
+    }
     if (!isLogged(g.date)) { futureExcluded++; return; }
     logged++;
     if (d.matt && d.tom) { matt += 0.5; tom += 0.5; }
@@ -529,6 +537,9 @@ function updateStats() {
   document.getElementById('sRev').textContent = '$' + rev.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0});
   const perGame = notClaimedCount ? notClaimedRev / notClaimedCount : 0;
   document.getElementById('sRevPerGame').textContent = '$' + perGame.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+  const sResolvedNetEl = document.getElementById('sResolvedNet');
+  sResolvedNetEl.textContent = (resolvedNet < 0 ? '-$' : '$') + Math.abs(resolvedNet).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+  sResolvedNetEl.style.color = resolvedNet < 0 ? '#E81828' : '#16a34a';
   document.getElementById('statsFootnote').textContent =
     `$/Game is calculated from ${notClaimedCount} games — excludes ${claimedExcluded} claimed by Matt/Tom, ${futureExcluded} not yet played, and ${allStarExcluded} All-Star Week events.`;
   const allStarNet = allStarCost - allStarRecovered;
