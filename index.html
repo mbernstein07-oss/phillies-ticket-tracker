@@ -51,6 +51,13 @@
   }
   .allstar-banner strong { color: #002D62; }
 
+  .postseason-banner {
+    background: #fffbeb;
+    border-bottom: 1px solid #fde68a;
+    color: #92400e;
+  }
+  .postseason-banner strong { color: #92400e; }
+
   .stats-row {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -255,6 +262,7 @@
 </div>
 
 <div class="allstar-banner" id="allStarBanner"></div>
+<div class="allstar-banner postseason-banner" id="postseasonBanner"></div>
 
 <div class="stats-row">
   <div class="stat-card"><div class="stat-value" id="sLogged">0</div><div class="stat-label">Logged</div></div>
@@ -368,7 +376,21 @@ const PREFILLED_DATA = {
 "2026-08-22":{"sold":true,"amount":88.20,"matt":false,"tom":false,"notes":"SeatGeek payout $88.20","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/1a02ade092f0ee3b"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/1a034501c7f0de18"}]},
 "2026-08-23":{"sold":true,"amount":97.20,"matt":false,"tom":false,"notes":"SeatGeek payout $97.20 (sold in advance on Aug 22)","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/1a02b980a251047c"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/1a03556051196b17"}]},
 "2026-09-04":{"sold":true,"amount":100.00,"matt":false,"tom":false,"notes":"Sold directly to Jen for $100 via Venmo (off-platform, not via SeatGeek)."},
-"2026-09-05":{"sold":true,"amount":189.00,"matt":false,"tom":false,"notes":"SeatGeek sale confirmed; $189.00 is the estimated payout shown in the sale email (sold in advance on Sep 2, no separate payout-received email yet — game hasn't happened yet)","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/1a062a6c7b03bc18"}]}
+"2026-09-05":{"sold":true,"amount":189.00,"matt":false,"tom":false,"notes":"SeatGeek sale confirmed; $189.00 is the estimated payout shown in the sale email (sold in advance on Sep 2, no separate payout-received email yet — game hasn't happened yet)","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/1a062a6c7b03bc18"}]},
+"2026-10-06":{"cost":200.00,"notes":"2026 Wild Card Home Game 1 — 2 seats @ $100 (Sec 320, Row 2, Seats 7-8). Part of postseason ticket order 48603720 (Confirmation Transaction ID 74367828, $5,645.00 total for all 14 potential home games).","autoLogged":true,"emails":[{"label":"Purchase","url":"https://mail.google.com/mail/u/0/#all/1a069947de79ee27"}]},
+"2026-10-07":{"cost":200.00,"notes":"2026 Wild Card Home Game 2 — 2 seats @ $100 (Sec 320, Row 2, Seats 7-8). Part of postseason ticket order 48603720.","autoLogged":true,"emails":[{"label":"Purchase","url":"https://mail.google.com/mail/u/0/#all/1a069947de79ee27"}]},
+"2026-10-08":{"cost":200.00,"notes":"2026 Wild Card Home Game 3 — 2 seats @ $100 (Sec 320, Row 2, Seats 7-8). Part of postseason ticket order 48603720.","autoLogged":true,"emails":[{"label":"Purchase","url":"https://mail.google.com/mail/u/0/#all/1a069947de79ee27"}]},
+"2026-10-11":{"cost":230.00,"notes":"2026 Division Series Home Game 1 — 2 seats @ $115 (Sec 320, Row 2, Seats 7-8). Part of postseason ticket order 48603720.","autoLogged":true,"emails":[{"label":"Purchase","url":"https://mail.google.com/mail/u/0/#all/1a069947de79ee27"}]},
+"2026-10-12":{"cost":230.00,"notes":"2026 Division Series Home Game 2 — 2 seats @ $115 (Sec 320, Row 2, Seats 7-8). Part of postseason ticket order 48603720.","autoLogged":true,"emails":[{"label":"Purchase","url":"https://mail.google.com/mail/u/0/#all/1a069947de79ee27"}]},
+"2026-10-13":{"cost":230.00,"notes":"2026 Division Series Home Game 3 — 2 seats @ $115 (Sec 320, Row 2, Seats 7-8). Part of postseason ticket order 48603720.","autoLogged":true,"emails":[{"label":"Purchase","url":"https://mail.google.com/mail/u/0/#all/1a069947de79ee27"}]},
+"2026-10-16":{"cost":370.00,"notes":"2026 NLCS Home Game 1 — 2 seats @ $185 (Sec 320, Row 2, Seats 7-8). Part of postseason ticket order 48603720.","autoLogged":true,"emails":[{"label":"Purchase","url":"https://mail.google.com/mail/u/0/#all/1a069947de79ee27"}]},
+"2026-10-17":{"cost":370.00,"notes":"2026 NLCS Home Game 2 — 2 seats @ $185 (Sec 320, Row 2, Seats 7-8). Part of postseason ticket order 48603720.","autoLogged":true,"emails":[{"label":"Purchase","url":"https://mail.google.com/mail/u/0/#all/1a069947de79ee27"}]},
+"2026-10-18":{"cost":370.00,"notes":"2026 NLCS Home Game 3 — 2 seats @ $185 (Sec 320, Row 2, Seats 7-8). Part of postseason ticket order 48603720.","autoLogged":true,"emails":[{"label":"Purchase","url":"https://mail.google.com/mail/u/0/#all/1a069947de79ee27"}]},
+"2026-10-19":{"cost":370.00,"notes":"2026 NLCS Home Game 4 — 2 seats @ $185 (Sec 320, Row 2, Seats 7-8). Part of postseason ticket order 48603720.","autoLogged":true,"emails":[{"label":"Purchase","url":"https://mail.google.com/mail/u/0/#all/1a069947de79ee27"}]},
+"2026-10-23":{"cost":710.00,"notes":"2026 World Series Home Game 1 — 2 seats @ $355 (Sec 320, Row 2, Seats 7-8). Part of postseason ticket order 48603720.","autoLogged":true,"emails":[{"label":"Purchase","url":"https://mail.google.com/mail/u/0/#all/1a069947de79ee27"}]},
+"2026-10-24":{"cost":710.00,"notes":"2026 World Series Home Game 2 — 2 seats @ $355 (Sec 320, Row 2, Seats 7-8). Part of postseason ticket order 48603720.","autoLogged":true,"emails":[{"label":"Purchase","url":"https://mail.google.com/mail/u/0/#all/1a069947de79ee27"}]},
+"2026-10-27":{"cost":710.00,"notes":"2026 World Series Home Game 3 — 2 seats @ $355 (Sec 320, Row 2, Seats 7-8). Part of postseason ticket order 48603720.","autoLogged":true,"emails":[{"label":"Purchase","url":"https://mail.google.com/mail/u/0/#all/1a069947de79ee27"}]},
+"2026-10-28":{"cost":745.00,"notes":"2026 World Series Home Game 4 — 2 seats @ $355 (Sec 320, Row 2, Seats 7-8) = $710.00, plus the $35.00 order charge on the full 14-game order ($5,645.00 total), added here so the tracker's summed cost matches what was actually charged.","autoLogged":true,"emails":[{"label":"Purchase","url":"https://mail.google.com/mail/u/0/#all/1a069947de79ee27"}]}
 };
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -458,6 +480,21 @@ const GAMES = [
   {date:'2026-09-25',day:'Fri',opp:'Tampa Bay Rays'},
   {date:'2026-09-26',day:'Sat',opp:'Tampa Bay Rays'},
   {date:'2026-09-27',day:'Sun',opp:'Tampa Bay Rays'},
+  // Postseason — dates TBD, placeholders below in likely round order; update once MLB sets real dates/times
+  {date:'2026-10-06',day:'TBD',opp:'Wild Card Home Game 1',special:true,postseason:true},
+  {date:'2026-10-07',day:'TBD',opp:'Wild Card Home Game 2',special:true,postseason:true},
+  {date:'2026-10-08',day:'TBD',opp:'Wild Card Home Game 3',special:true,postseason:true},
+  {date:'2026-10-11',day:'TBD',opp:'Division Series Home Game 1',special:true,postseason:true},
+  {date:'2026-10-12',day:'TBD',opp:'Division Series Home Game 2',special:true,postseason:true},
+  {date:'2026-10-13',day:'TBD',opp:'Division Series Home Game 3',special:true,postseason:true},
+  {date:'2026-10-16',day:'TBD',opp:'NLCS Home Game 1',special:true,postseason:true},
+  {date:'2026-10-17',day:'TBD',opp:'NLCS Home Game 2',special:true,postseason:true},
+  {date:'2026-10-18',day:'TBD',opp:'NLCS Home Game 3',special:true,postseason:true},
+  {date:'2026-10-19',day:'TBD',opp:'NLCS Home Game 4',special:true,postseason:true},
+  {date:'2026-10-23',day:'TBD',opp:'World Series Home Game 1',special:true,postseason:true},
+  {date:'2026-10-24',day:'TBD',opp:'World Series Home Game 2',special:true,postseason:true},
+  {date:'2026-10-27',day:'TBD',opp:'World Series Home Game 3',special:true,postseason:true},
+  {date:'2026-10-28',day:'TBD',opp:'World Series Home Game 4',special:true,postseason:true},
 ];
 
 const STORAGE_KEY = 'phillies_2026_v2';
@@ -504,15 +541,22 @@ function isLogged(date) {
 function updateStats() {
   let logged=0, matt=0, tom=0, sold=0, rev=0;
   let notClaimedCount=0, notClaimedRev=0;
-  let claimedExcluded=0, futureExcluded=0, allStarExcluded=0;
+  let claimedExcluded=0, futureExcluded=0, allStarExcluded=0, postseasonExcluded=0;
   let allStarCost=0, allStarRecovered=0;
+  let postseasonCost=0, postseasonRecovered=0;
   let resolvedNet=0;
   GAMES.forEach(g => {
     if (g.special) {
-      allStarExcluded++;
       const d = data[g.date] || {};
-      allStarCost += (parseFloat(d.cost) || 0);
-      if (d.sold) allStarRecovered += (parseFloat(d.amount) || 0);
+      if (g.postseason) {
+        postseasonExcluded++;
+        postseasonCost += (parseFloat(d.cost) || 0);
+        if (d.sold) postseasonRecovered += (parseFloat(d.amount) || 0);
+      } else {
+        allStarExcluded++;
+        allStarCost += (parseFloat(d.cost) || 0);
+        if (d.sold) allStarRecovered += (parseFloat(d.amount) || 0);
+      }
       if (d.matt && d.tom) { matt += 0.5; tom += 0.5; }
       else if (d.matt) matt++;
       else if (d.tom) tom++;
@@ -549,12 +593,17 @@ function updateStats() {
   sResolvedNetEl.textContent = (resolvedNet < 0 ? '-$' : '$') + Math.abs(resolvedNet).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
   sResolvedNetEl.style.color = resolvedNet < 0 ? '#E81828' : '#16a34a';
   document.getElementById('statsFootnote').textContent =
-    `$/Game is calculated from ${notClaimedCount} games — excludes ${claimedExcluded} claimed by Matt/Tom, ${futureExcluded} not yet played, and ${allStarExcluded} All-Star Week events.`;
+    `$/Game is calculated from ${notClaimedCount} games — excludes ${claimedExcluded} claimed by Matt/Tom, ${futureExcluded} not yet played, ${allStarExcluded} All-Star Week events, and ${postseasonExcluded} postseason games.`;
   const allStarNet = allStarCost - allStarRecovered;
   document.getElementById('allStarBanner').innerHTML =
     `<strong>All-Star Week:</strong> $${allStarCost.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} spent on tickets · ` +
     `$${allStarRecovered.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} recovered from sales · ` +
     `net <strong>$${allStarNet.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</strong>`;
+  const postseasonNet = postseasonCost - postseasonRecovered;
+  document.getElementById('postseasonBanner').innerHTML =
+    `<strong>Postseason:</strong> $${postseasonCost.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} committed for up to ${postseasonExcluded} home games · ` +
+    `$${postseasonRecovered.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} recovered so far · ` +
+    `net <strong>$${postseasonNet.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</strong> (updates as rounds are played, resold, or refunded for rounds not reached)`;
 }
 
 function buildRow(game) {
