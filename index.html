@@ -58,6 +58,44 @@
   }
   .postseason-banner strong { color: #92400e; }
 
+  .ledger-section {
+    background: white;
+    padding: 10px 16px;
+    border-bottom: 1px solid #e5e5e5;
+  }
+  .ledger-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #002D62;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 6px;
+  }
+  .ledger-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 12px;
+    padding: 4px 0;
+    border-bottom: 1px dashed #eee;
+  }
+  .ledger-row:last-child { border-bottom: none; }
+  .ledger-row-label { color: #444; }
+  .ledger-note { display: block; font-size: 10px; color: #999; margin-top: 1px; }
+  .ledger-amt { font-weight: 700; color: #16a34a; white-space: nowrap; }
+  .ledger-empty { font-size: 11px; color: #999; }
+  .ledger-current {
+    margin-top: 8px;
+    padding: 8px 10px;
+    background: #f9f9f9;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    font-size: 11px;
+    color: #444;
+    line-height: 1.5;
+  }
+  .ledger-current strong { color: #002D62; }
+
   .stats-row {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -264,6 +302,12 @@
 <div class="allstar-banner" id="allStarBanner"></div>
 <div class="allstar-banner postseason-banner" id="postseasonBanner"></div>
 
+<div class="ledger-section">
+  <div class="ledger-title">Tom Settlement Ledger</div>
+  <div id="ledgerHistory"></div>
+  <div class="ledger-current" id="ledgerCurrent"></div>
+</div>
+
 <div class="stats-row">
   <div class="stat-card"><div class="stat-value" id="sLogged">0</div><div class="stat-label">Logged</div></div>
   <div class="stat-card"><div class="stat-value" id="sMatt">0</div><div class="stat-label">Matt Used</div></div>
@@ -358,7 +402,7 @@ const PREFILLED_DATA = {
 "2026-07-19":{"sold":true,"amount":39.60,"matt":false,"tom":false,"notes":"SeatGeek payout $39.60","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19f781c5286f08fd"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19f814a4a983fc4f"}]},
 "2026-07-20":{"sold":true,"amount":72.00,"matt":false,"tom":false,"notes":"SeatGeek payout $72.00","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19f7fbccc7a02a46"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19f89b7546b4b565"}]},
 "2026-07-21":{"sold":true,"amount":36.00,"matt":false,"tom":false,"notes":"SeatGeek payout $36.00","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19f85b88267f3037"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19f8ed2ef260d8e4"}]},
-"2026-07-22":{"cost":64.00,"sold":true,"amount":86.40,"matt":false,"tom":false,"notes":"Matt bought 4 extra tickets (Sec 303, Row 19, Seats 1-4, All-Star Player Flash Sale pricing) via Phillies.com for $64.00 (Confirmation PHLV-2092535-73350019), separate from the usual season seats Sec 320/Row 2/Seats 7-8. Resold on SeatGeek for $86.40 net — $22.40 profit.","autoLogged":true,"emails":[{"label":"Purchase","url":"https://mail.google.com/mail/u/0/#all/19f60f9676c7d12b"},{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19f89fbada9d701c"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19f94451c846245d"}]},
+"2026-07-22":{"cost":64.00,"sold":true,"amount":86.40,"matt":false,"tom":false,"excludeFromSplit":true,"notes":"Matt bought 4 extra tickets (Sec 303, Row 19, Seats 1-4, All-Star Player Flash Sale pricing) via Phillies.com for $64.00 (Confirmation PHLV-2092535-73350019), separate from the usual season seats Sec 320/Row 2/Seats 7-8. Resold on SeatGeek for $86.40 net — $22.40 profit. Matt's own side purchase, excluded from the Tom revenue split.","autoLogged":true,"emails":[{"label":"Purchase","url":"https://mail.google.com/mail/u/0/#all/19f60f9676c7d12b"},{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19f89fbada9d701c"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19f94451c846245d"}]},
 "2026-07-24":{"sold":true,"amount":178.20,"matt":false,"tom":false,"notes":"SeatGeek payout $178.20 (sold in advance on Jul 22)","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19f8aee26fbf68c2"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19f9e39348e95d02"}]},
 "2026-07-25":{"sold":true,"amount":205.20,"matt":false,"tom":false,"notes":"SeatGeek payout $205.20 (sold in advance on Jul 24)","autoLogged":true,"emails":[{"label":"Sold","url":"https://mail.google.com/mail/u/0/#all/19f974af08e025c3"},{"label":"Paid","url":"https://mail.google.com/mail/u/0/#all/19fa3b80e4d24094"}]},
 "2026-07-26":{"sold":false,"matt":true,"tom":false,"notes":"Given to Matt's parents, Len and Ellan, as guests (not sold)."},
@@ -502,6 +546,20 @@ const today = new Date().toISOString().slice(0,10);
 const SEASON_TICKET_COST = 8008; // paid for 2 tickets to each Phillies home game (All-Star Week events excluded)
 const HOME_GAMES = GAMES.filter(g => !g.special);
 const AVG_COST_PER_GAME = HOME_GAMES.length ? SEASON_TICKET_COST / HOME_GAMES.length : 0;
+
+// ─── TOM SETTLEMENT LEDGER ─────────────────────────────────────────────────
+// Payments actually made to Tom for his half of shared ticket revenue.
+// Regular-season games only (All-Star Week & postseason settle separately).
+// A game counts toward the shared pool unless: not sold, claimed by
+// Matt/Tom (matt or tom true), or flagged excludeFromSplit (Matt's own
+// side purchases/flips, e.g. the Jul 22 Dodgers extras).
+const TOM_SETTLEMENTS = [
+  {date:'2026-09-04', amount:867.00, periodStart:'2026-07-15', periodEnd:'2026-09-05',
+   notes:"Everything since the All-Star break through Sat Sep 5 (incl. an advance on that day's Braves sale, still pending payout at time of payment), excluding Matt's Jul 22 Dodgers extras flip."}
+];
+const NEXT_PAYMENT_START = '2026-09-06'; // Sun vs. Braves
+const NEXT_PAYMENT_END   = '2026-09-27'; // last regular-season game (vs. Rays)
+
 let data = {};
 let activeFilter = 'all';
 
@@ -525,6 +583,7 @@ function load() {
 function persist() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   updateStats();
+  renderTomLedger();
 }
 
 function fmtDate(s) {
@@ -536,6 +595,47 @@ function fmtDate(s) {
 function isLogged(date) {
   const g = data[date] || {};
   return !!(g.matt || g.tom || g.sold || g.noReceipt || g.checkedNoReceipt || (g.notes && g.notes.trim()));
+}
+
+// Sum shared (splittable) revenue in [startDate, endDate], regular-season games only.
+// "Confirmed" = money actually received (a Paid email, or an off-platform sale —
+// those settle immediately via Venmo/cash so they're never "pending").
+// "Pending" = sold on SeatGeek but payout not confirmed yet.
+function computeSharedRevenue(startDate, endDate) {
+  let confirmed = 0, pending = 0;
+  GAMES.forEach(g => {
+    if (g.special) return;
+    if (g.date < startDate || g.date > endDate) return;
+    const d = data[g.date] || {};
+    if (!d.sold || d.matt || d.tom || d.excludeFromSplit) return;
+    const amt = parseFloat(d.amount) || 0;
+    const confirmedFlag = !d.autoLogged || (Array.isArray(d.emails) && d.emails.some(e => e.label && /paid/i.test(e.label)));
+    if (confirmedFlag) confirmed += amt; else pending += amt;
+  });
+  return { confirmed, pending };
+}
+
+function renderTomLedger() {
+  const historyEl = document.getElementById('ledgerHistory');
+  historyEl.innerHTML = TOM_SETTLEMENTS.length
+    ? TOM_SETTLEMENTS.map(s => `
+        <div class="ledger-row">
+          <div class="ledger-row-label">${fmtDate(s.periodStart)}–${fmtDate(s.periodEnd)} · paid ${fmtDate(s.date)}
+            <span class="ledger-note">${s.notes}</span>
+          </div>
+          <div class="ledger-amt">$${s.amount.toFixed(2)}</div>
+        </div>`).join('')
+    : '<div class="ledger-empty">No payments logged yet.</div>';
+
+  const { confirmed, pending } = computeSharedRevenue(NEXT_PAYMENT_START, NEXT_PAYMENT_END);
+  const half = confirmed / 2;
+  const halfPending = pending / 2;
+  document.getElementById('ledgerCurrent').innerHTML =
+    `<strong>Next payment (accruing):</strong> ${fmtDate(NEXT_PAYMENT_START)}–${fmtDate(NEXT_PAYMENT_END)} — ` +
+    `confirmed so far: <strong>$${confirmed.toFixed(2)}</strong> (Tom's half: <strong>$${half.toFixed(2)}</strong>)` +
+    (pending > 0.004
+      ? ` · plus $${pending.toFixed(2)} sold but not yet paid out (+$${halfPending.toFixed(2)} once confirmed)`
+      : '');
 }
 
 function updateStats() {
@@ -785,6 +885,7 @@ load();
 render();
 updateStats();
 updateCostBanner();
+renderTomLedger();
 </script>
 </body>
 </html>
